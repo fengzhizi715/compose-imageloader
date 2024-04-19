@@ -6,6 +6,7 @@ import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
 import cn.netdiscovery.compose.imageloader.cache.memory.MemoryCache
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
 import cn.netdiscovery.compose.imageloader.transform.Transformer
+import cn.netdiscovery.compose.imageloader.utils.toBitmapPainter
 import cn.netdiscovery.compose.imageloader.utils.transformationKey
 import kotlinx.coroutines.*
 import java.io.File
@@ -84,9 +85,9 @@ object ImageLoaderFactory {
 
         return scope.async(Dispatchers.IO) {
             val key = LruUtil.hashKey(file.absolutePath) + transformers.transformationKey()
-            val hasCache = memoryLruCache.getBitmap(key)
-            if (hasCache != null) {
-                ImageResponse(hasCache.toBitmapPainter(), null)
+            val cachedImageBitmap = memoryLruCache.getBitmap(key)
+            if (cachedImageBitmap != null) {
+                ImageResponse(cachedImageBitmap.toBitmapPainter(), null)
             } else {
                 try {
                     var imageBitmap = file.inputStream().buffered().use(::loadImageBitmap)
@@ -103,6 +104,7 @@ object ImageLoaderFactory {
     }
 
     private suspend fun runUrlLoad(request: ImageRequest): ImageResponse {
+
         val url = request.url
         if (url.isNullOrEmpty()) {
             debugLog("onError - Url is null or empty!")
@@ -122,17 +124,19 @@ object ImageLoaderFactory {
                 debugLog("onLoading")
                 return@async ImageResponse(null, null, true)
             }
+
             try {
                 val cacheFile = try {
                     diskLruCache?.get(diskKey)
                 } catch (e: IOException) {
                     null
                 }
+
                 if (cacheFile == null) {
                     debugLog("pull ($url)")
                     loadingImageMap[diskKey] = true
                     val data = scope.async(client.dispatcher()) {
-                        client.pullImage(url, diskKey, request.ua)
+                        client.getImage(url, diskKey, request.ua)
                     }.await()
                     val newFetchedCache = data?.contentSnapshot
                     if (newFetchedCache == null) {

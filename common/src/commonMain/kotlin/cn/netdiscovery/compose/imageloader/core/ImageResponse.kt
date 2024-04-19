@@ -12,8 +12,6 @@ import androidx.compose.ui.graphics.painter.Painter
  * @date: 2024/4/16 23:25
  * @version: V1.0 <描述当前版本功能>
  */
-internal fun ImageBitmap.toBitmapPainter(): BitmapPainter = BitmapPainter(this)
-
 val defaultResponse = ImageResponse(null, null, true)
 
 data class ImageResponse(

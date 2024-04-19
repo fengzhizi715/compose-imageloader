@@ -34,15 +34,13 @@ class MemoryCache(size: Long) {
         })
     }
 
-    suspend fun getBitmap(key: String): ImageBitmap? {
-        return lruCache.get(key)
-    }
+    suspend fun getBitmap(key: String): ImageBitmap? = lruCache.get(key)
 
     suspend fun putBitmap(key: String?, bitmap: ImageBitmap?) {
         if (key.isNullOrEmpty() || bitmap == null) {
             return
         }
-        val success = lruCache.put(key, bitmap)
-//        ImageLoaderLogger.debugLog("Memory Cache: " + lruCache.size.toString() + " / " + lruCache.maxSize)
+
+        lruCache.put(key, bitmap)
     }
 }

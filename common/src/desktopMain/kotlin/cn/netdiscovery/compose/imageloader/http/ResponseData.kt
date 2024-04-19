@@ -13,7 +13,6 @@ data class ResponseData(
     val contentLength: Int = 0,
     val contentSnapshot: File
 ) {
-
     private var imageType: ImageType? = null
 
     init {
