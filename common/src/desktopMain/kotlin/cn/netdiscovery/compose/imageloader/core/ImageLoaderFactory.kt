@@ -1,8 +1,8 @@
 package cn.netdiscovery.compose.imageloader.core
 
 import androidx.compose.ui.res.loadImageBitmap
-import cn.netdiscovery.compose.imageloader.cache.LruUtil
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
+import cn.netdiscovery.compose.imageloader.cache.hashKey
 import cn.netdiscovery.compose.imageloader.cache.memory.MemoryCache
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
 import cn.netdiscovery.compose.imageloader.log.DefaultLogger
@@ -60,14 +60,15 @@ object ImageLoaderFactory {
         ImageLoaderFactory.rootDirectory = rootDirectory
         ImageLoaderFactory.logger = logger
 
+        memoryLruCache = MemoryCache(ImageLoaderFactory.maxMemoryCacheSize)
+        client = HttpConnectionClient()
+
         imageCacheDir = File(ImageLoaderFactory.rootDirectory, "imageCache")
         if (!imageCacheDir.exists()) {
             if (!imageCacheDir.mkdirs()) {
                 throw IllegalStateException("Could not create image cache directory: ${imageCacheDir.absolutePath}")
             }
         }
-        memoryLruCache = MemoryCache(ImageLoaderFactory.maxMemoryCacheSize)
-        client = HttpConnectionClient()
 
         scope.launch {
             diskLruCache = DiskLruCache.open(directory = imageCacheDir, maxSize = ImageLoaderFactory.maxDiskCacheSize)
@@ -86,7 +87,7 @@ object ImageLoaderFactory {
     private suspend fun runFileLoad(file: File, transformers: MutableList<Transformer>): ImageResponse {
 
         return scope.async(Dispatchers.IO) {
-            val key = LruUtil.hashKey(file.absolutePath) + transformers.transformationKey()
+            val key = hashKey(file.absolutePath) + transformers.transformationKey()
             val cachedImageBitmap = memoryLruCache.getBitmap(key)
             if (cachedImageBitmap != null) {
                 ImageResponse(cachedImageBitmap.toBitmapPainter(), null)
@@ -115,7 +116,7 @@ object ImageLoaderFactory {
 
         return scope.async(Dispatchers.IO) {
 
-            val diskKey = LruUtil.hashKey(url)
+            val diskKey = hashKey(url)
 
             if (request.useCache) {
 
@@ -137,7 +138,7 @@ object ImageLoaderFactory {
 
                     // disk 也取不到数据，则通过 http 获取图片
                     if (cacheFile == null) {
-                        "get ($url)".logI()
+                        "get url: $url".logI()
                         val data = scope.async(client.dispatcher()) {
                             client.getImage(url, diskKey, request.ua)
                         }.await()
@@ -148,22 +149,10 @@ object ImageLoaderFactory {
                             errorMsg.logE()
                             return@async ImageResponse(null, NullPointerException(errorMsg))
                         } else {
-                            var imageBitmap = loadImageBitmap(newFetchedCache.inputStream())
-                            for (transformer in request.transformers) {
-                                imageBitmap = transformer.transform(imageBitmap)
-                            }
-                            memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                            "onSuccess - from: network".logI()
-                            return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
+                            return@async getImageResponse(request,newFetchedCache,memoryKey,1)
                         }
                     } else {
-                        var imageBitmap = loadImageBitmap(cacheFile.inputStream())
-                        for (transformer in request.transformers) {
-                            imageBitmap = transformer.transform(imageBitmap)
-                        }
-                        memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                        "onSuccess - from: disk".logI()
-                        return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
+                        return@async getImageResponse(request,cacheFile,memoryKey,2)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -171,23 +160,41 @@ object ImageLoaderFactory {
                     return@async ImageResponse(null, e)
                 }
             } else {
-                "get ($url)".logI()
+                "get url: $url".logI()
                 val data = scope.async(client.dispatcher()) {
                     client.getImage(url, diskKey, request.ua)
                 }.await()
 
                 if (data!=null) {
-                    var imageBitmap = loadImageBitmap(data.contentSnapshot.inputStream())
-                    for (transformer in request.transformers) {
-                        imageBitmap = transformer.transform(imageBitmap)
-                    }
-
-                    return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
+                    return@async getImageResponse(request,data.contentSnapshot,"",3)
                 } else {
                     return@async ImageResponse(null, NullPointerException("Can't get the image..."))
                 }
             }
         }.await()
+    }
+
+    private suspend fun getImageResponse(request:ImageRequest, file:File, memoryKey:String, status:Int):ImageResponse {
+        var imageBitmap = loadImageBitmap(file.inputStream())
+        for (transformer in request.transformers) {
+            imageBitmap = transformer.transform(imageBitmap)
+        }
+
+        when(status) {
+            1 -> {
+                memoryLruCache.putBitmap(memoryKey, imageBitmap)
+                "onSuccess - from: network".logI()
+            }
+            2 -> {
+                memoryLruCache.putBitmap(memoryKey, imageBitmap)
+                "onSuccess - from: disk".logI()
+            }
+            3 -> {
+                "onSuccess - from: network".logI()
+            }
+        }
+
+        return ImageResponse(imageBitmap.toBitmapPainter(), null)
     }
 
     fun shutdown() {

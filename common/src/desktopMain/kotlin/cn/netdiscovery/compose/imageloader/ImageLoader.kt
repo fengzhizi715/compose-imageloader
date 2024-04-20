@@ -40,7 +40,8 @@ actual fun imageFile(filePath: String, transformations: List<Transformer>?, imag
 
 
 @Composable
-private fun imageSuspendLoad(key: String, imageCallback: ImageCallback,
+private fun imageSuspendLoad(key: String,
+                             imageCallback: ImageCallback,
                              block: suspend () -> ImageResponse) {
     var imageResponse by remember { mutableStateOf(defaultResponse) }
 
