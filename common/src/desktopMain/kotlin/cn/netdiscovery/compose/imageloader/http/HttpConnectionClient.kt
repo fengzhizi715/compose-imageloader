@@ -1,6 +1,7 @@
 package cn.netdiscovery.compose.imageloader.http
 
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
+import cn.netdiscovery.compose.imageloader.log.logE
 import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.utils.closeQuietly
 import cn.netdiscovery.compose.imageloader.utils.extension.openConnection
@@ -28,19 +29,19 @@ class HttpConnectionClient(
             conn = url.openConnection(ua)
             conn.requestMethod = "GET"
             if (conn.responseCode != 200) {
-                "Response status code is (${conn.responseCode})!".logI()
+                "Response status code is (${conn.responseCode})!".logE()
                 return null
             }
 
             val contentTypeString = conn.contentType
             if (contentTypeString == null) {
-                "Content-type is null!".logI()
+                "Content-type is null!".logE()
                 return null
             }
 
             val contentLength = conn.contentLength
             if (contentLength <= 0) {
-                "Content length is null!".logI()
+                "Content length is null!".logE()
                 return null
             }
 

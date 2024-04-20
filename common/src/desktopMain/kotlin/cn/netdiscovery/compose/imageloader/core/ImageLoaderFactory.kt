@@ -7,6 +7,7 @@ import cn.netdiscovery.compose.imageloader.cache.memory.MemoryCache
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
 import cn.netdiscovery.compose.imageloader.log.DefaultLogger
 import cn.netdiscovery.compose.imageloader.log.Logger
+import cn.netdiscovery.compose.imageloader.log.logE
 import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.transform.Transformer
 import cn.netdiscovery.compose.imageloader.utils.extension.toBitmapPainter
@@ -108,7 +109,7 @@ object ImageLoaderFactory {
 
         val url = request.url
         if (url.isNullOrEmpty()) {
-            "onError - Url is null or empty!".logI()
+            ("request's url is null or empty!").logE()
             return ImageResponse(null, NullPointerException("Url is null or empty!"))
         }
 
@@ -117,6 +118,8 @@ object ImageLoaderFactory {
             val diskKey = LruUtil.hashKey(url)
 
             if (request.useCache) {
+
+                // 优先取 memory 的数据
                 val memoryKey = diskKey + request.transformers.transformationKey()
                 val memoryImage = memoryLruCache.getBitmap(memoryKey)
                 if (memoryImage != null) {
@@ -124,6 +127,7 @@ object ImageLoaderFactory {
                     return@async ImageResponse(memoryImage.toBitmapPainter(), null)
                 }
 
+                // memory 取不到数据，再去 disk 中取数据
                 try {
                     val cacheFile = try {
                         diskLruCache?.get(diskKey)
@@ -131,21 +135,22 @@ object ImageLoaderFactory {
                         null
                     }
 
+                    // disk 也取不到数据，则通过 http 获取图片
                     if (cacheFile == null) {
                         "get ($url)".logI()
                         val data = scope.async(client.dispatcher()) {
                             client.getImage(url, diskKey, request.ua)
                         }.await()
+
                         val newFetchedCache = data?.contentSnapshot
                         if (newFetchedCache == null) {
-                            "onError".logI()
-                            return@async ImageResponse(null, NullPointerException("Can't find the local image snapshot"))
+                            val errorMsg = "Can't find the local image snapshot"
+                            errorMsg.logE()
+                            return@async ImageResponse(null, NullPointerException(errorMsg))
                         } else {
                             var imageBitmap = loadImageBitmap(newFetchedCache.inputStream())
-                            if (diskKey != memoryKey) {
-                                for (transformer in request.transformers) {
-                                    imageBitmap = transformer.transform(imageBitmap)
-                                }
+                            for (transformer in request.transformers) {
+                                imageBitmap = transformer.transform(imageBitmap)
                             }
                             memoryLruCache.putBitmap(memoryKey, imageBitmap)
                             "onSuccess - from: network".logI()
@@ -153,10 +158,8 @@ object ImageLoaderFactory {
                         }
                     } else {
                         var imageBitmap = loadImageBitmap(cacheFile.inputStream())
-                        if (diskKey != memoryKey) {
-                            for (transformer in request.transformers) {
-                                imageBitmap = transformer.transform(imageBitmap)
-                            }
+                        for (transformer in request.transformers) {
+                            imageBitmap = transformer.transform(imageBitmap)
                         }
                         memoryLruCache.putBitmap(memoryKey, imageBitmap)
                         "onSuccess - from: disk".logI()
@@ -164,10 +167,11 @@ object ImageLoaderFactory {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    "onError".logI()
+                    "onError".logE()
                     return@async ImageResponse(null, e)
                 }
             } else {
+                "get ($url)".logI()
                 val data = scope.async(client.dispatcher()) {
                     client.getImage(url, diskKey, request.ua)
                 }.await()

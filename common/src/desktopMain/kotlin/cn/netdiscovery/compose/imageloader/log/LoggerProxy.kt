@@ -58,3 +58,5 @@ object LoggerProxy {
 }
 
 fun String.logI(tag:String = "imageloader") = LoggerProxy.getLogger().i(this, tag)
+
+fun String.logE(tag:String = "imageloader") = LoggerProxy.getLogger().e(this, tag = tag, tr = null)
