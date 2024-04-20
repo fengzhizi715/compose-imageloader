@@ -183,14 +183,14 @@ object ImageLoaderFactory {
         when(status) {
             1 -> {
                 memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                "onSuccess - from: network".logI()
+                "onSuccess - load from: network".logI()
             }
             2 -> {
                 memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                "onSuccess - from: disk".logI()
+                "onSuccess - load from: disk".logI()
             }
             3 -> {
-                "onSuccess - from: network".logI()
+                "onSuccess - load from: network(never use cache)".logI()
             }
         }
 
