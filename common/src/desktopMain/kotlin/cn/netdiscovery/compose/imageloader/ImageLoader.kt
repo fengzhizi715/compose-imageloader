@@ -3,7 +3,7 @@ package cn.netdiscovery.compose.imageloader
 import androidx.compose.runtime.*
 import cn.netdiscovery.compose.imageloader.core.*
 import cn.netdiscovery.compose.imageloader.transform.Transformer
-import cn.netdiscovery.compose.imageloader.utils.transformationKey
+import cn.netdiscovery.compose.imageloader.utils.extension.transformationKey
 import java.io.File
 
 /**

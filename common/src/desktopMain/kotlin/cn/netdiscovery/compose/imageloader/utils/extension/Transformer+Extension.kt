@@ -1,4 +1,4 @@
-package cn.netdiscovery.compose.imageloader.utils
+package cn.netdiscovery.compose.imageloader.utils.extension
 
 import cn.netdiscovery.compose.imageloader.transform.Transformer
 

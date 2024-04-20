@@ -15,6 +15,7 @@ class ImageRequest {
     internal var ua: String? = null
     internal var url: String? = null
     internal var file: File? = null
+    internal var useCache:Boolean = true
 
     internal var saveStrategy = SaveStrategy.Original
     internal var transformers = mutableListOf<Transformer>()
@@ -38,15 +39,20 @@ class ImageRequest {
         return this
     }
 
-    fun transformations(transformations: List<Transformer>?): ImageRequest {
-        if (!transformations.isNullOrEmpty()) {
-            transformers.addAll(transformations)
-        }
+    fun useCache(useCache: Boolean): ImageRequest {
+        this.useCache = useCache
         return this
     }
 
     fun saveStrategy(strategy: SaveStrategy): ImageRequest {
         saveStrategy = strategy
+        return this
+    }
+
+    fun transformations(transformations: List<Transformer>?): ImageRequest {
+        if (!transformations.isNullOrEmpty()) {
+            transformers.addAll(transformations)
+        }
         return this
     }
 

@@ -1,4 +1,4 @@
-package cn.netdiscovery.compose.imageloader.utils
+package cn.netdiscovery.compose.imageloader.utils.extension
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter

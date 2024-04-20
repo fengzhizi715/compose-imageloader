@@ -6,8 +6,8 @@ import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
 import cn.netdiscovery.compose.imageloader.cache.memory.MemoryCache
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
 import cn.netdiscovery.compose.imageloader.transform.Transformer
-import cn.netdiscovery.compose.imageloader.utils.toBitmapPainter
-import cn.netdiscovery.compose.imageloader.utils.transformationKey
+import cn.netdiscovery.compose.imageloader.utils.extension.toBitmapPainter
+import cn.netdiscovery.compose.imageloader.utils.extension.transformationKey
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException
@@ -112,64 +112,83 @@ object ImageLoaderFactory {
         }
 
         return scope.async(Dispatchers.IO) {
+
             val diskKey = LruUtil.hashKey(url)
-            val memoryKey = diskKey + request.transformers.transformationKey()
-            val memoryImage = memoryLruCache.getBitmap(memoryKey)
-            if (memoryImage != null) {
-                debugLog("onSuccess - from: memory")
-                return@async ImageResponse(memoryImage.toBitmapPainter(), null)
-            }
 
-            if (loadingImageMap[diskKey] == true) {
-                debugLog("onLoading")
-                return@async ImageResponse(null, null, true)
-            }
-
-            try {
-                val cacheFile = try {
-                    diskLruCache?.get(diskKey)
-                } catch (e: IOException) {
-                    null
+            if (request.useCache) {
+                val memoryKey = diskKey + request.transformers.transformationKey()
+                val memoryImage = memoryLruCache.getBitmap(memoryKey)
+                if (memoryImage != null) {
+                    debugLog("onSuccess - from: memory")
+                    return@async ImageResponse(memoryImage.toBitmapPainter(), null)
                 }
 
-                if (cacheFile == null) {
-                    debugLog("pull ($url)")
-                    loadingImageMap[diskKey] = true
-                    val data = scope.async(client.dispatcher()) {
-                        client.getImage(url, diskKey, request.ua)
-                    }.await()
-                    val newFetchedCache = data?.contentSnapshot
-                    if (newFetchedCache == null) {
-                        debugLog("onError")
-                        loadingImageMap[diskKey] = false
-                        return@async ImageResponse(null, NullPointerException("Can't find the local image snapshot"))
+                if (loadingImageMap[diskKey] == true) {
+                    debugLog("onLoading")
+                    return@async ImageResponse(null, null, true)
+                }
+
+                try {
+                    val cacheFile = try {
+                        diskLruCache?.get(diskKey)
+                    } catch (e: IOException) {
+                        null
+                    }
+
+                    if (cacheFile == null) {
+                        debugLog("pull ($url)")
+                        loadingImageMap[diskKey] = true
+                        val data = scope.async(client.dispatcher()) {
+                            client.getImage(url, diskKey, request.ua)
+                        }.await()
+                        val newFetchedCache = data?.contentSnapshot
+                        if (newFetchedCache == null) {
+                            debugLog("onError")
+                            loadingImageMap[diskKey] = false
+                            return@async ImageResponse(null, NullPointerException("Can't find the local image snapshot"))
+                        } else {
+                            var imageBitmap = loadImageBitmap(newFetchedCache.inputStream())
+                            if (diskKey != memoryKey) {
+                                for (transformer in request.transformers) {
+                                    imageBitmap = transformer.transform(imageBitmap)
+                                }
+                            }
+                            memoryLruCache.putBitmap(memoryKey, imageBitmap)
+                            debugLog("onSuccess - from: network")
+                            loadingImageMap[diskKey] = false
+                            return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
+                        }
                     } else {
-                        var imageBitmap = loadImageBitmap(newFetchedCache.inputStream())
+                        var imageBitmap = loadImageBitmap(cacheFile.inputStream())
                         if (diskKey != memoryKey) {
                             for (transformer in request.transformers) {
                                 imageBitmap = transformer.transform(imageBitmap)
                             }
                         }
                         memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                        debugLog("onSuccess - from: network")
-                        loadingImageMap[diskKey] = false
+                        debugLog("onSuccess - from: disk")
                         return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
                     }
-                } else {
-                    var imageBitmap = loadImageBitmap(cacheFile.inputStream())
-                    if (diskKey != memoryKey) {
-                        for (transformer in request.transformers) {
-                            imageBitmap = transformer.transform(imageBitmap)
-                        }
-                    }
-                    memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                    debugLog("onSuccess - from: disk")
-                    return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    debugLog("onError")
+                    return@async ImageResponse(null, e)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                debugLog("onError")
-                return@async ImageResponse(null, e)
+            } else {
+                val data = scope.async(client.dispatcher()) {
+                    client.getImage(url, diskKey, request.ua)
+                }.await()
+
+                if (data!=null) {
+                    var imageBitmap = loadImageBitmap(data.contentSnapshot.inputStream())
+                    for (transformer in request.transformers) {
+                        imageBitmap = transformer.transform(imageBitmap)
+                    }
+
+                    return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
+                } else {
+                    return@async ImageResponse(null, NullPointerException("Can't get the image..."))
+                }
             }
         }.await()
     }
