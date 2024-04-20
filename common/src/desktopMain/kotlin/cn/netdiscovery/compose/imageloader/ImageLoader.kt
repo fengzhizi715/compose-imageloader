@@ -16,29 +16,32 @@ import java.io.File
  */
 @Composable
 actual fun imageUrl(url: String, transformations: List<Transformer>?, imageCallback: ImageCallback) {
-    imageSuspendLoad(url + transformations?.transformationKey(), imageCallback) {
+    val key = url + transformations?.transformationKey()
+    imageSuspendLoad(key, imageCallback) {
         ImageRequest.create()
             .url(url)
             .transformations(transformations)
-            .saveStrategy(SaveStrategy.Original)
+            .saveStrategy(SaveStrategy.ORIGINAL)
             .request()
     }
 }
 
 @Composable
 actual fun imageFile(filePath: String, transformations: List<Transformer>?, imageCallback: ImageCallback) {
-    imageSuspendLoad(key = filePath + transformations?.transformationKey(), imageCallback) {
+    val key = filePath + transformations?.transformationKey()
+    imageSuspendLoad(key = key, imageCallback) {
         ImageRequest.create()
             .file(File(filePath))
             .transformations(transformations)
-            .saveStrategy(SaveStrategy.Original)
+            .saveStrategy(SaveStrategy.ORIGINAL)
             .request()
     }
 }
 
 
 @Composable
-private fun imageSuspendLoad(key: String, imageCallback: ImageCallback, block: suspend () -> ImageResponse) {
+private fun imageSuspendLoad(key: String, imageCallback: ImageCallback,
+                             block: suspend () -> ImageResponse) {
     var imageResponse by remember { mutableStateOf(defaultResponse) }
 
     LaunchedEffect(key) {

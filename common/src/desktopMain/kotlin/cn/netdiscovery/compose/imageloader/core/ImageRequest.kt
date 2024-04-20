@@ -17,7 +17,7 @@ class ImageRequest {
     internal var file: File? = null
     internal var useCache:Boolean = true
 
-    internal var saveStrategy = SaveStrategy.Original
+    internal var saveStrategy = SaveStrategy.ORIGINAL
     internal var transformers = mutableListOf<Transformer>()
 
     companion object{

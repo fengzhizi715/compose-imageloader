@@ -22,7 +22,7 @@ import kotlin.properties.Delegates
  * @version: V1.0 <描述当前版本功能>
  */
 enum class SaveStrategy {
-    Original, Transformed
+    ORIGINAL,TRANSFORMED
 }
 
 object ImageLoaderFactory {
@@ -42,8 +42,6 @@ object ImageLoaderFactory {
     private lateinit var memoryLruCache: MemoryCache
     private lateinit var imageCacheDir: File
     private lateinit var client: HttpConnectionClient
-
-    private val loadingImageMap = HashMap<String, Boolean>()
 
     fun configuration(
         maxMemoryCacheSize: Long = CACHE_DEFAULT_MEMORY_SIZE,
@@ -123,11 +121,6 @@ object ImageLoaderFactory {
                     return@async ImageResponse(memoryImage.toBitmapPainter(), null)
                 }
 
-                if (loadingImageMap[diskKey] == true) {
-                    debugLog("onLoading")
-                    return@async ImageResponse(null, null, true)
-                }
-
                 try {
                     val cacheFile = try {
                         diskLruCache?.get(diskKey)
@@ -137,14 +130,12 @@ object ImageLoaderFactory {
 
                     if (cacheFile == null) {
                         debugLog("pull ($url)")
-                        loadingImageMap[diskKey] = true
                         val data = scope.async(client.dispatcher()) {
                             client.getImage(url, diskKey, request.ua)
                         }.await()
                         val newFetchedCache = data?.contentSnapshot
                         if (newFetchedCache == null) {
                             debugLog("onError")
-                            loadingImageMap[diskKey] = false
                             return@async ImageResponse(null, NullPointerException("Can't find the local image snapshot"))
                         } else {
                             var imageBitmap = loadImageBitmap(newFetchedCache.inputStream())
@@ -155,7 +146,6 @@ object ImageLoaderFactory {
                             }
                             memoryLruCache.putBitmap(memoryKey, imageBitmap)
                             debugLog("onSuccess - from: network")
-                            loadingImageMap[diskKey] = false
                             return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
                         }
                     } else {
