@@ -5,6 +5,9 @@ import cn.netdiscovery.compose.imageloader.cache.LruUtil
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
 import cn.netdiscovery.compose.imageloader.cache.memory.MemoryCache
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
+import cn.netdiscovery.compose.imageloader.log.DefaultLogger
+import cn.netdiscovery.compose.imageloader.log.Logger
+import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.transform.Transformer
 import cn.netdiscovery.compose.imageloader.utils.extension.toBitmapPainter
 import cn.netdiscovery.compose.imageloader.utils.extension.transformationKey
@@ -30,10 +33,12 @@ object ImageLoaderFactory {
     const val CACHE_DEFAULT_MEMORY_SIZE = 1024 * 1024 * 300L
     const val CACHE_DEFAULT_DISK_SIZE = 1024 * 1024 * 100L
     val USER_DIR = File(System.getProperty("user.dir"))
+    val defaultLog = DefaultLogger
 
     var maxMemoryCacheSize by Delegates.notNull<Long>()
     var maxDiskCacheSize by Delegates.notNull<Long>()
     lateinit var rootDirectory:File
+    lateinit var logger:Logger
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
@@ -46,11 +51,13 @@ object ImageLoaderFactory {
     fun configuration(
         maxMemoryCacheSize: Long = CACHE_DEFAULT_MEMORY_SIZE,
         maxDiskCacheSize: Long = CACHE_DEFAULT_DISK_SIZE,
-        rootDirectory: File = USER_DIR
+        rootDirectory: File = USER_DIR,
+        logger:Logger = defaultLog
     ) {
         ImageLoaderFactory.maxMemoryCacheSize = maxMemoryCacheSize
         ImageLoaderFactory.maxDiskCacheSize = maxDiskCacheSize
         ImageLoaderFactory.rootDirectory = rootDirectory
+        ImageLoaderFactory.logger = logger
 
         imageCacheDir = File(ImageLoaderFactory.rootDirectory, "imageCache")
         if (!imageCacheDir.exists()) {
@@ -105,7 +112,7 @@ object ImageLoaderFactory {
 
         val url = request.url
         if (url.isNullOrEmpty()) {
-            debugLog("onError - Url is null or empty!")
+            "onError - Url is null or empty!".logI()
             return ImageResponse(null, NullPointerException("Url is null or empty!"))
         }
 
@@ -129,7 +136,7 @@ object ImageLoaderFactory {
                     }
 
                     if (cacheFile == null) {
-                        debugLog("pull ($url)")
+                        "get ($url)".logI()
                         val data = scope.async(client.dispatcher()) {
                             client.getImage(url, diskKey, request.ua)
                         }.await()
@@ -145,7 +152,7 @@ object ImageLoaderFactory {
                                 }
                             }
                             memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                            debugLog("onSuccess - from: network")
+                            "onSuccess - from: network".logI()
                             return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
                         }
                     } else {
