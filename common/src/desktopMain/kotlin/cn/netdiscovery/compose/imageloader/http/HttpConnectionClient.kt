@@ -1,6 +1,7 @@
 package cn.netdiscovery.compose.imageloader.http
 
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
+import cn.netdiscovery.compose.imageloader.utils.closeQuietly
 import cn.netdiscovery.compose.imageloader.utils.openConnection
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -29,26 +30,26 @@ class HttpConnectionClient(
                 debugLog("Response status code is (${conn.responseCode})!")
                 return null
             }
+
             val contentTypeString = conn.contentType
             if (contentTypeString == null) {
                 debugLog("Content-type is null!")
                 return null
             }
+
             val contentLength = conn.contentLength
             if (contentLength <= 0) {
                 debugLog("Content length is null!")
                 return null
             }
+
             inputStream = conn.inputStream
 
             diskLruCache?.getOrPut(key) { cacheFile ->
                 try {
                     val outputStream = cacheFile.outputStream()
                     inputStream.copyTo(outputStream)
-                    try {
-                        outputStream.close()
-                    } catch (e: Exception) {
-                    }
+                    closeQuietly(outputStream)
                     true // Caching succeeded - Save the file
                 } catch (ex: IOException) {
                     false
@@ -60,10 +61,7 @@ class HttpConnectionClient(
             error.printStackTrace()
             return null
         } finally {
-            try {
-                inputStream?.close()
-            } catch (ignored: IOException) {
-            }
+            closeQuietly(inputStream)
             conn?.disconnect()
         }
     }
