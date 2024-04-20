@@ -74,10 +74,6 @@ object ImageLoaderFactory {
         }
     }
 
-    private fun debugLog(msg: String) {
-//        ImageLoaderLogger.debugLog("Thread: ${Thread.currentThread().name}, $msg")
-    }
-
     suspend fun enqueue(request: ImageRequest): ImageResponse {
         val loadFile = request.file
         if (loadFile != null && loadFile.exists()) {
@@ -124,7 +120,7 @@ object ImageLoaderFactory {
                 val memoryKey = diskKey + request.transformers.transformationKey()
                 val memoryImage = memoryLruCache.getBitmap(memoryKey)
                 if (memoryImage != null) {
-                    debugLog("onSuccess - from: memory")
+                   "onSuccess - from: memory".logI()
                     return@async ImageResponse(memoryImage.toBitmapPainter(), null)
                 }
 
@@ -142,7 +138,7 @@ object ImageLoaderFactory {
                         }.await()
                         val newFetchedCache = data?.contentSnapshot
                         if (newFetchedCache == null) {
-                            debugLog("onError")
+                            "onError".logI()
                             return@async ImageResponse(null, NullPointerException("Can't find the local image snapshot"))
                         } else {
                             var imageBitmap = loadImageBitmap(newFetchedCache.inputStream())
@@ -163,12 +159,12 @@ object ImageLoaderFactory {
                             }
                         }
                         memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                        debugLog("onSuccess - from: disk")
+                        "onSuccess - from: disk".logI()
                         return@async ImageResponse(imageBitmap.toBitmapPainter(), null)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    debugLog("onError")
+                    "onError".logI()
                     return@async ImageResponse(null, e)
                 }
             } else {

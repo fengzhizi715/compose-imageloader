@@ -1,6 +1,7 @@
 package cn.netdiscovery.compose.imageloader.http
 
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
+import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.utils.closeQuietly
 import cn.netdiscovery.compose.imageloader.utils.extension.openConnection
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,19 +28,19 @@ class HttpConnectionClient(
             conn = url.openConnection(ua)
             conn.requestMethod = "GET"
             if (conn.responseCode != 200) {
-                debugLog("Response status code is (${conn.responseCode})!")
+                "Response status code is (${conn.responseCode})!".logI()
                 return null
             }
 
             val contentTypeString = conn.contentType
             if (contentTypeString == null) {
-                debugLog("Content-type is null!")
+                "Content-type is null!".logI()
                 return null
             }
 
             val contentLength = conn.contentLength
             if (contentLength <= 0) {
-                debugLog("Content length is null!")
+                "Content length is null!".logI()
                 return null
             }
 
@@ -68,9 +69,5 @@ class HttpConnectionClient(
 
     fun close() {
         job.cancel()
-    }
-
-    private fun debugLog(msg: String) {
-//        ImageLoaderLogger.debugLog("Thread: ${Thread.currentThread().name}, $msg")
     }
 }
