@@ -33,12 +33,12 @@ object ImageLoaderFactory {
     const val CACHE_DEFAULT_MEMORY_SIZE = 1024 * 1024 * 300L
     const val CACHE_DEFAULT_DISK_SIZE = 1024 * 1024 * 100L
     val USER_DIR = File(System.getProperty("user.dir"))
-    val defaultLog = DefaultLogger
+    val defaultLogger = DefaultLogger
 
-    var maxMemoryCacheSize by Delegates.notNull<Long>()
-    var maxDiskCacheSize by Delegates.notNull<Long>()
-    lateinit var rootDirectory:File
-    lateinit var logger:Logger
+    private var maxMemoryCacheSize by Delegates.notNull<Long>()
+    private var maxDiskCacheSize by Delegates.notNull<Long>()
+    private lateinit var rootDirectory:File
+    private lateinit var logger:Logger
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
@@ -52,7 +52,7 @@ object ImageLoaderFactory {
         maxMemoryCacheSize: Long = CACHE_DEFAULT_MEMORY_SIZE,
         maxDiskCacheSize: Long = CACHE_DEFAULT_DISK_SIZE,
         rootDirectory: File = USER_DIR,
-        logger:Logger = defaultLog
+        logger:Logger = defaultLogger
     ) {
         ImageLoaderFactory.maxMemoryCacheSize = maxMemoryCacheSize
         ImageLoaderFactory.maxDiskCacheSize = maxDiskCacheSize
