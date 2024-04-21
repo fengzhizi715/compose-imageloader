@@ -117,11 +117,11 @@ object ImageLoaderFactory {
         return scope.async(Dispatchers.IO) {
 
             val diskKey = md5Key(url)
+            val memoryKey = diskKey + request.transformers.transformationKey()
 
             if (request.useCache) {
 
                 // 优先取 memory 的数据
-                val memoryKey = diskKey + request.transformers.transformationKey()
                 val memoryImage = memoryLruCache.getBitmap(memoryKey)
                 if (memoryImage != null) {
                    "onSuccess - load url:${request.url} from memory".logI()
@@ -149,10 +149,10 @@ object ImageLoaderFactory {
                             errorMsg.logE()
                             return@async ImageResponse(null, NullPointerException(errorMsg))
                         } else {
-                            return@async getImageResponse(request,newFetchedCache,memoryKey,1)
+                            return@async getImageResponse(request,newFetchedCache,diskKey,memoryKey,1)
                         }
                     } else {
-                        return@async getImageResponse(request,cacheFile,memoryKey,2)
+                        return@async getImageResponse(request,cacheFile,diskKey,memoryKey,2)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -167,7 +167,7 @@ object ImageLoaderFactory {
                 }.await()
 
                 if (data!=null) {
-                    return@async getImageResponse(request,data.contentSnapshot,"",3)
+                    return@async getImageResponse(request,data.contentSnapshot,diskKey,"",3)
                 } else {
                     return@async ImageResponse(null, NullPointerException("Can't get the image..."))
                 }
@@ -175,11 +175,20 @@ object ImageLoaderFactory {
         }.await()
     }
 
-    private suspend fun getImageResponse(request:ImageRequest, file:File, memoryKey:String, status:Int):ImageResponse {
+    /**
+     * @param status 1:通过 http 获取图片；2:从 disk 中取数据；3：每次通过 http 获取图片
+     */
+    private suspend fun getImageResponse(request:ImageRequest,
+                                         file:File,
+                                         diskKey:String,
+                                         memoryKey:String,
+                                         status:Int):ImageResponse {
         var imageBitmap = loadImageBitmap(file.inputStream())
 
-        for (transformer in request.transformers) {
-            imageBitmap = transformer.transform(imageBitmap)
+        if (diskKey != memoryKey) {
+            for (transformer in request.transformers) {
+                imageBitmap = transformer.transform(imageBitmap)
+            }
         }
 
         when(status) {

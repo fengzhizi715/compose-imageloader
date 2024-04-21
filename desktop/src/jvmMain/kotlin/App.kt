@@ -40,7 +40,7 @@ fun App() {
                     imageCallback = ImageCallback(placeHolderView = {
                         defaultPlaceHolderView()
                     }) {
-                        Image(modifier = Modifier.size(800.dp), painter = it, contentDescription = "123")
+                        Image(modifier = Modifier.size(800.dp), painter = it, contentDescription = "")
                     })
             }
         }
