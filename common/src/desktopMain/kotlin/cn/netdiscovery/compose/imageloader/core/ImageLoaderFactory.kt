@@ -2,7 +2,7 @@ package cn.netdiscovery.compose.imageloader.core
 
 import androidx.compose.ui.res.loadImageBitmap
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
-import cn.netdiscovery.compose.imageloader.cache.hashKey
+import cn.netdiscovery.compose.imageloader.cache.md5Key
 import cn.netdiscovery.compose.imageloader.cache.memory.MemoryCache
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
 import cn.netdiscovery.compose.imageloader.log.DefaultLogger
@@ -26,7 +26,7 @@ import kotlin.properties.Delegates
  * @version: V1.0 <描述当前版本功能>
  */
 enum class SaveStrategy {
-    ORIGINAL,TRANSFORMED
+    ORIGINAL, TRANSFORMED
 }
 
 object ImageLoaderFactory {
@@ -87,7 +87,7 @@ object ImageLoaderFactory {
     private suspend fun runFileLoad(file: File, transformers: MutableList<Transformer>): ImageResponse {
 
         return scope.async(Dispatchers.IO) {
-            val key = hashKey(file.absolutePath) + transformers.transformationKey()
+            val key = md5Key(file.absolutePath) + transformers.transformationKey()
             val cachedImageBitmap = memoryLruCache.getBitmap(key)
             if (cachedImageBitmap != null) {
                 ImageResponse(cachedImageBitmap.toBitmapPainter(), null)
@@ -116,7 +116,7 @@ object ImageLoaderFactory {
 
         return scope.async(Dispatchers.IO) {
 
-            val diskKey = hashKey(url)
+            val diskKey = md5Key(url)
 
             if (request.useCache) {
 
@@ -160,6 +160,7 @@ object ImageLoaderFactory {
                     return@async ImageResponse(null, e)
                 }
             } else {
+                // 每次通过 http 获取图片
                 "get url: $url".logI()
                 val data = scope.async(client.dispatcher()) {
                     client.getImage(url, diskKey, request.ua)
@@ -176,6 +177,7 @@ object ImageLoaderFactory {
 
     private suspend fun getImageResponse(request:ImageRequest, file:File, memoryKey:String, status:Int):ImageResponse {
         var imageBitmap = loadImageBitmap(file.inputStream())
+
         for (transformer in request.transformers) {
             imageBitmap = transformer.transform(imageBitmap)
         }

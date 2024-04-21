@@ -2,7 +2,6 @@ package cn.netdiscovery.compose.imageloader.http
 
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
 import cn.netdiscovery.compose.imageloader.log.logE
-import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.utils.closeQuietly
 import cn.netdiscovery.compose.imageloader.utils.extension.openConnection
 import kotlinx.coroutines.CoroutineDispatcher

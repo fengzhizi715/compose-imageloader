@@ -3,7 +3,7 @@ package cn.netdiscovery.compose.imageloader.cache
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
-fun hashKey(key: String): String {
+fun md5Key(key: String): String {
     val cacheKey: String = try {
         val mDigest = MessageDigest.getInstance("MD5")
         mDigest.update(key.toByteArray())

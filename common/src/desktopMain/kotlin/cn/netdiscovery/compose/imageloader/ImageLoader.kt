@@ -29,7 +29,7 @@ actual fun imageUrl(url: String, transformations: List<Transformer>?, imageCallb
 @Composable
 actual fun imageFile(filePath: String, transformations: List<Transformer>?, imageCallback: ImageCallback) {
     val key = filePath + transformations?.transformationKey()
-    imageSuspendLoad(key = key, imageCallback) {
+    imageSuspendLoad(key, imageCallback) {
         ImageRequest.create()
             .file(File(filePath))
             .transformations(transformations)
