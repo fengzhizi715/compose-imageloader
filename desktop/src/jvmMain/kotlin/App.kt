@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory
-import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory.USER_DIR
 import cn.netdiscovery.compose.imageloader.core.ImageCallback
 import cn.netdiscovery.compose.imageloader.imageUrl
+import java.io.File
 
 @Composable
 fun defaultPlaceHolderView() {
@@ -24,7 +24,7 @@ fun App() {
 
     LaunchedEffect(Unit) {
         // configure the image loader
-        ImageLoaderFactory.configuration(1024 * 1024 * 100L, 1024 * 1024 * 50L, USER_DIR)
+        ImageLoaderFactory.configuration(1024 * 1024 * 100L, 1024 * 1024 * 50L, File(System.getProperty("user.dir")))
     }
 
     MaterialTheme(colors = lightColors().copy(primary = Color(0xFFF5730A))) {

@@ -4,6 +4,7 @@ import androidx.compose.ui.res.loadImageBitmap
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
 import cn.netdiscovery.compose.imageloader.cache.md5Key
 import cn.netdiscovery.compose.imageloader.cache.memory.MemoryCache
+import cn.netdiscovery.compose.imageloader.exception.ImageLoaderException
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
 import cn.netdiscovery.compose.imageloader.log.DefaultLogger
 import cn.netdiscovery.compose.imageloader.log.Logger
@@ -33,8 +34,8 @@ object ImageLoaderFactory {
 
     const val CACHE_DEFAULT_MEMORY_SIZE = 1024 * 1024 * 300L
     const val CACHE_DEFAULT_DISK_SIZE = 1024 * 1024 * 100L
-    val USER_DIR = File(System.getProperty("user.dir"))
-    val defaultLogger = DefaultLogger
+    private val USER_DIR = File(System.getProperty("user.dir"))
+    private val defaultLogger = DefaultLogger
 
     private var maxMemoryCacheSize by Delegates.notNull<Long>()
     private var maxDiskCacheSize by Delegates.notNull<Long>()
@@ -147,7 +148,7 @@ object ImageLoaderFactory {
                         if (newFetchedCache == null) {
                             val errorMsg = "Can't find the local image snapshot"
                             errorMsg.logE()
-                            return@async ImageResponse(null, NullPointerException(errorMsg))
+                            return@async ImageResponse(null, ImageLoaderException(errorMsg))
                         } else {
                             return@async getImageResponse(request,newFetchedCache,diskKey,memoryKey,1)
                         }
@@ -169,7 +170,7 @@ object ImageLoaderFactory {
                 if (data!=null) {
                     return@async getImageResponse(request,data.contentSnapshot,diskKey,"",3)
                 } else {
-                    return@async ImageResponse(null, NullPointerException("Can't get the image..."))
+                    return@async ImageResponse(null, ImageLoaderException("Can't get the image..."))
                 }
             }
         }.await()
