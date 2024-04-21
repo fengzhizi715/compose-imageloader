@@ -50,6 +50,13 @@ fun main() = application {
                     //显示快捷键
                     shortcut = KeyShortcut(Key.C, ctrl = true)
                 )
+
+                Menu("transform") {
+                    Item("transform 1", onClick = { })
+                    Item("transform 2", onClick = { })
+                    Item("transform 3", onClick = { })
+                    Item("transform 4", onClick = { })
+                }
             }
         }
 
