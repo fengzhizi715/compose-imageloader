@@ -19,8 +19,8 @@ import androidx.compose.ui.layout.ContentScale
  */
 class ImageCallback(
     val placeHolderView: (@Composable () -> Unit)? = null,
-    val errorView: (@Composable () -> Unit)? = null,
-    val imageView: (@Composable (Painter) -> Unit)
+    val errorView:       (@Composable () -> Unit)? = null,
+    val imageView:       (@Composable (Painter) -> Unit)
 ) {
 
     companion object {

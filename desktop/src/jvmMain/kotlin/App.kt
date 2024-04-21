@@ -20,6 +20,13 @@ fun defaultPlaceHolderView() {
 }
 
 @Composable
+fun defaultErrorView() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("error view")
+    }
+}
+
+@Composable
 fun App() {
 
     LaunchedEffect(Unit) {
@@ -39,6 +46,8 @@ fun App() {
                     transformations = mutableListOf(),
                     imageCallback = ImageCallback(placeHolderView = {
                         defaultPlaceHolderView()
+                    }, errorView = {
+                        defaultErrorView()
                     }) {
                         Image(modifier = Modifier.size(800.dp), painter = it, contentDescription = "")
                     })
