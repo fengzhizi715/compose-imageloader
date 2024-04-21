@@ -6,10 +6,7 @@ import cn.netdiscovery.compose.imageloader.cache.md5Key
 import cn.netdiscovery.compose.imageloader.cache.memory.MemoryCache
 import cn.netdiscovery.compose.imageloader.exception.ImageLoaderException
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
-import cn.netdiscovery.compose.imageloader.log.DefaultLogger
-import cn.netdiscovery.compose.imageloader.log.Logger
-import cn.netdiscovery.compose.imageloader.log.logE
-import cn.netdiscovery.compose.imageloader.log.logI
+import cn.netdiscovery.compose.imageloader.log.*
 import cn.netdiscovery.compose.imageloader.transform.Transformer
 import cn.netdiscovery.compose.imageloader.utils.extension.toBitmapPainter
 import cn.netdiscovery.compose.imageloader.utils.extension.transformationKey
@@ -70,6 +67,8 @@ object ImageLoaderFactory {
                 throw IllegalStateException("Could not create image cache directory: ${imageCacheDir.absolutePath}")
             }
         }
+
+        LoggerProxy.initLogger(logger)
 
         scope.launch {
             diskLruCache = DiskLruCache.open(directory = imageCacheDir, maxSize = ImageLoaderFactory.maxDiskCacheSize)
