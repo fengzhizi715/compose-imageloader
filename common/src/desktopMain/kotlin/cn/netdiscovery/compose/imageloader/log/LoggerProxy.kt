@@ -18,7 +18,7 @@ interface Logger {
 
 object DefaultLogger: Logger {
     override fun i(msg: String, tag: String?) {
-        println("$tag $msg")
+        println("${Thread.currentThread().name} $tag $msg")
     }
 
     override fun v(msg: String, tag: String?) {
@@ -36,7 +36,7 @@ object DefaultLogger: Logger {
 
     override fun e(msg: String, tag: String?, tr: Throwable?) {
         tr?.printStackTrace()
-        System.err.println("$tag $msg")
+        System.err.println("${Thread.currentThread().name} $tag $msg")
     }
 }
 

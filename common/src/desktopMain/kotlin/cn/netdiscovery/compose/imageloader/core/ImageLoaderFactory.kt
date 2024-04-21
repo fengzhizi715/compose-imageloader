@@ -124,7 +124,7 @@ object ImageLoaderFactory {
                 val memoryKey = diskKey + request.transformers.transformationKey()
                 val memoryImage = memoryLruCache.getBitmap(memoryKey)
                 if (memoryImage != null) {
-                   "onSuccess - from: memory".logI()
+                   "onSuccess - load url:${request.url} from memory".logI()
                     return@async ImageResponse(memoryImage.toBitmapPainter(), null)
                 }
 
@@ -183,14 +183,14 @@ object ImageLoaderFactory {
         when(status) {
             1 -> {
                 memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                "onSuccess - load from: network".logI()
+                "onSuccess - load url:${request.url} from network".logI()
             }
             2 -> {
                 memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                "onSuccess - load from: disk".logI()
+                "onSuccess - load url:${request.url} from disk".logI()
             }
             3 -> {
-                "onSuccess - load from: network(never use cache)".logI()
+                "onSuccess - load url:${request.url} from network(never use cache)".logI()
             }
         }
 
