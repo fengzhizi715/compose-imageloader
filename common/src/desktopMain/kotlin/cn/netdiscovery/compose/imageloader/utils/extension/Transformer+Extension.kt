@@ -14,5 +14,8 @@ internal fun List<Transformer>?.transformationKey(): String {
     if (this.isNullOrEmpty()) {
         return ""
     }
-    return this.joinToString("-") { it.tag() }
+
+    return this.joinToString("-") {
+        it.javaClass.simpleName
+    }
 }

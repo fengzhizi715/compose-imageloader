@@ -8,10 +8,6 @@ import java.awt.image.BufferedImage
 
 class ResizeTransformation(private val width: Int, private val height: Int) : Transformer {
 
-    override fun tag(): String {
-        return TransformationTag.ResizeTransformation
-    }
-
     override fun transform(imageBitmap: ImageBitmap): ImageBitmap {
         if (width == imageBitmap.width && height == imageBitmap.height) {
             return imageBitmap

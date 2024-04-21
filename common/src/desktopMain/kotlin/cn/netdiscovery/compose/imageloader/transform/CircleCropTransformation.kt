@@ -15,10 +15,6 @@ class CircleCropTransformation(
     private val backgroundColor: Color? = null
 ) : Transformer {
 
-    override fun tag(): String {
-        return TransformationTag.CircleCropTransformation
-    }
-
     override fun transform(imageBitmap: ImageBitmap): ImageBitmap {
         val tmp = imageBitmap.toAwtImage()
         val size = if (imageBitmap.width > imageBitmap.height) {

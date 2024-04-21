@@ -11,8 +11,6 @@ import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory
 import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory.USER_DIR
 import cn.netdiscovery.compose.imageloader.core.ImageCallback
 import cn.netdiscovery.compose.imageloader.imageUrl
-import cn.netdiscovery.compose.imageloader.transform.Transformation
-import kotlin.random.Random
 
 @Composable
 fun defaultPlaceHolderView() {
@@ -23,8 +21,6 @@ fun defaultPlaceHolderView() {
 
 @Composable
 fun App() {
-
-    var transformation by remember { mutableStateOf(Transformation().toList()) }
 
     LaunchedEffect(Unit) {
         // configure the image loader
@@ -40,7 +36,7 @@ fun App() {
             Spacer(modifier = Modifier.height(16.dp))
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 imageUrl(imageUrl,
-                    transformations = transformation,
+                    transformations = mutableListOf(),
                     imageCallback = ImageCallback(placeHolderView = {
                         defaultPlaceHolderView()
                     }) {

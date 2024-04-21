@@ -6,10 +6,6 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 
 class CenterCropTransformation(private val width: Int, private val height: Int) : Transformer {
 
-    override fun tag(): String {
-        return TransformationTag.CenterCropTransformation
-    }
-
     override fun transform(imageBitmap: ImageBitmap): ImageBitmap {
         val sourceWidth = imageBitmap.width
         val sourceHeight = imageBitmap.height

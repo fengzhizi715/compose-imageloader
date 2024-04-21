@@ -12,7 +12,5 @@ import androidx.compose.ui.graphics.ImageBitmap
  */
 interface Transformer {
 
-    fun tag(): String
-
     fun transform(imageBitmap: ImageBitmap): ImageBitmap
 }
