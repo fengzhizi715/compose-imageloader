@@ -211,7 +211,6 @@ object ImageLoaderFactory {
 
     fun shutdown() {
         job.cancel()
-        client.close()
     }
 
     fun shutdownAndClearEverything() {

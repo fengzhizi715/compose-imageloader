@@ -17,9 +17,6 @@ import java.net.HttpURLConnection
 class HttpConnectionClient(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
-
-    private val job = Job()
-
     var diskLruCache: DiskLruCache? = null
 
     fun dispatcher(): CoroutineDispatcher = dispatcher
@@ -54,7 +51,7 @@ class HttpConnectionClient(
             } while (retry < RETRY_MAX)
 
             if (conn?.responseCode != 200) {
-                "Response status code is (${conn?.responseCode})!".logE()
+                "Response status code is ${conn?.responseCode}".logE()
                 return null
             }
 
@@ -91,9 +88,5 @@ class HttpConnectionClient(
             closeQuietly(inputStream)
             conn?.disconnect()
         }
-    }
-
-    fun close() {
-        job.cancel()
     }
 }
