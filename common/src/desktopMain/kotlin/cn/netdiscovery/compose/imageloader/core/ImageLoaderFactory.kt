@@ -46,6 +46,7 @@ object ImageLoaderFactory {
     private lateinit var memoryLruCache: MemoryCache
     private lateinit var imageCacheDir: File
     private lateinit var client: HttpConnectionClient
+    const val RETRY_MAX = 3
 
     fun configuration(
         maxMemoryCacheSize: Long = CACHE_DEFAULT_MEMORY_SIZE,

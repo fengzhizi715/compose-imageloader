@@ -1,7 +1,9 @@
 package cn.netdiscovery.compose.imageloader.http
 
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
+import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory.RETRY_MAX
 import cn.netdiscovery.compose.imageloader.log.logE
+import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.utils.closeQuietly
 import cn.netdiscovery.compose.imageloader.utils.extension.openConnection
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,10 +27,35 @@ class HttpConnectionClient(
         var conn: HttpURLConnection? = null
         var inputStream: InputStream? = null
         try {
-            conn = url.openConnection(ua)
-            conn.requestMethod = "GET"
-            if (conn.responseCode != 200) {
-                "Response status code is (${conn.responseCode})!".logE()
+            var retry = 0
+            do {
+                conn = url.openConnection(ua)
+                conn.requestMethod = "GET"
+
+                when (conn.responseCode) {
+                    HttpURLConnection.HTTP_OK -> {
+                        "Response status code is ${conn.responseCode}".logI()
+                        break
+                    }
+
+                    HttpURLConnection.HTTP_GATEWAY_TIMEOUT ->  {
+                        "gateway timeout".logE()
+                        break
+                    }
+
+                    HttpURLConnection.HTTP_UNAVAILABLE -> {
+                        "http unavailable".logE()
+                        break
+                    }
+                }
+
+                retry++
+            } while (retry < RETRY_MAX)
+
+
+
+            if (conn?.responseCode != 200) {
+                "Response status code is (${conn?.responseCode})!".logE()
                 return null
             }
 
