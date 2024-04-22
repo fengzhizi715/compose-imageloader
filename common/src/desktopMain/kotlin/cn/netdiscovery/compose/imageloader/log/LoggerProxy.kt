@@ -26,7 +26,7 @@ object DefaultLogger: Logger {
     }
 
     override fun d(msg: String, tag: String?) {
-        println("$tag $msg")
+        println("${Thread.currentThread().name} $tag $msg")
     }
 
     override fun w(msg: String, tag: String?, tr: Throwable?) {
@@ -58,5 +58,7 @@ object LoggerProxy {
 }
 
 fun String.logI(tag:String = "imageloader") = LoggerProxy.getLogger().i(this, tag)
+
+fun String.logD(tag:String = "imageloader") = LoggerProxy.getLogger().d(this, tag)
 
 fun String.logE(tag:String = "imageloader") = LoggerProxy.getLogger().e(this, tag = tag, tr = null)

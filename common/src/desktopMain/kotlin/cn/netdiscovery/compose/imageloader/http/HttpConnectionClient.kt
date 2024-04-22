@@ -2,6 +2,7 @@ package cn.netdiscovery.compose.imageloader.http
 
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
 import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory.RETRY_MAX
+import cn.netdiscovery.compose.imageloader.log.logD
 import cn.netdiscovery.compose.imageloader.log.logE
 import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.utils.closeQuietly
@@ -34,7 +35,7 @@ class HttpConnectionClient(
 
                 when (conn.responseCode) {
                     HttpURLConnection.HTTP_OK -> {
-                        "Response status code is ${conn.responseCode}".logI()
+                        "Response status code is ${conn.responseCode}".logD()
                         break
                     }
 
@@ -51,8 +52,6 @@ class HttpConnectionClient(
 
                 retry++
             } while (retry < RETRY_MAX)
-
-
 
             if (conn?.responseCode != 200) {
                 "Response status code is (${conn?.responseCode})!".logE()

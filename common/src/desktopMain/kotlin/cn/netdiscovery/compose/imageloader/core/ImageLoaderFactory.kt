@@ -29,8 +29,8 @@ enum class SaveStrategy {
 
 object ImageLoaderFactory {
 
-    const val CACHE_DEFAULT_MEMORY_SIZE = 1024 * 1024 * 300L
-    const val CACHE_DEFAULT_DISK_SIZE = 1024 * 1024 * 100L
+    private const val CACHE_DEFAULT_MEMORY_SIZE = 1024 * 1024 * 300L // 300 M memory
+    private const val CACHE_DEFAULT_DISK_SIZE = 1024 * 1024 * 100L   // 100 M disk
     private val USER_DIR = File(System.getProperty("user.dir"))
     private val defaultLogger = DefaultLogger
 
@@ -125,7 +125,7 @@ object ImageLoaderFactory {
                 // 优先取 memory 的数据
                 val memoryImage = memoryLruCache.getBitmap(memoryKey)
                 if (memoryImage != null) {
-                   "onSuccess - load url:${request.url} from memory".logI()
+                   "onSuccess - load url:${request.url} from memory".logD()
                     return@async ImageResponse(memoryImage.toBitmapPainter(), null)
                 }
 
@@ -139,7 +139,7 @@ object ImageLoaderFactory {
 
                     // disk 也取不到数据，则通过 http 获取图片
                     if (cacheFile == null) {
-                        "get url: $url".logI()
+                        "get url: $url".logD()
                         val data = scope.async(client.dispatcher()) {
                             client.getImage(url, diskKey, request.ua)
                         }.await()
@@ -162,7 +162,7 @@ object ImageLoaderFactory {
                 }
             } else {
                 // 每次通过 http 获取图片
-                "get url: $url".logI()
+                "get url: $url".logD()
                 val data = scope.async(client.dispatcher()) {
                     client.getImage(url, diskKey, request.ua)
                 }.await()
@@ -195,14 +195,14 @@ object ImageLoaderFactory {
         when(status) {
             1 -> {
                 memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                "onSuccess - load url:${request.url} from network".logI()
+                "onSuccess - load url:${request.url} from network".logD()
             }
             2 -> {
                 memoryLruCache.putBitmap(memoryKey, imageBitmap)
-                "onSuccess - load url:${request.url} from disk".logI()
+                "onSuccess - load url:${request.url} from disk".logD()
             }
             3 -> {
-                "onSuccess - load url:${request.url} from network(never use cache)".logI()
+                "onSuccess - load url:${request.url} from network(never use cache)".logD()
             }
         }
 
