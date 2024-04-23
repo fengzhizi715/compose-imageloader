@@ -22,15 +22,15 @@ class GrayTransformation: Transformer {
 
         val image:BufferedImage = imageBitmap.toAwtImage()
 
-        for (i in 0 until width) {
-            for (j in 0 until height) {
-                val rgb = image.getRGB(i, j)
+        for (row in 0 until height) {
+            for (col in 0 until width) {
+                val rgb = image.getRGB(col,row)
                 val r = rgb and (0x00ff0000 shr 16)
                 val g = rgb and (0x0000ff00 shr 8)
                 val b = rgb and 0x000000ff
 
                 val color = (r * 0.299 + g * 0.587 + b * 0.114).toInt()
-                image.setRGB(i, j, Color(color, color, color).rgb)
+                image.setRGB(col, row, Color(color, color, color).rgb)
             }
         }
 
