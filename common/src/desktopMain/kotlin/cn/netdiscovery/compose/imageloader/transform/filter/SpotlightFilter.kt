@@ -3,6 +3,7 @@ package cn.netdiscovery.compose.imageloader.transform.filter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import java.awt.image.BufferedImage
+import kotlin.math.sqrt
 
 /**
  *
@@ -21,7 +22,7 @@ class SpotlightFilter(val factor:Int = 1):BaseFilter() {
         var index = 0
         val centerX = width / 2
         val centerY = height / 2
-        val maxDistance = Math.sqrt((centerX * centerX + centerY * centerY).toDouble())
+        val maxDistance = sqrt((centerX * centerX + centerY * centerY).toDouble())
         for (row in 0 until height) {
             var ta = 0
             var tr = 0
@@ -51,6 +52,6 @@ class SpotlightFilter(val factor:Int = 1):BaseFilter() {
     private fun getDistance(centerX: Int, centerY: Int, px: Int, py: Int): Double {
         val xx = ((centerX - px) * (centerX - px)).toDouble()
         val yy = ((centerY - py) * (centerY - py)).toDouble()
-        return Math.sqrt(xx + yy).toInt().toDouble()
+        return sqrt(xx + yy).toInt().toDouble()
     }
 }

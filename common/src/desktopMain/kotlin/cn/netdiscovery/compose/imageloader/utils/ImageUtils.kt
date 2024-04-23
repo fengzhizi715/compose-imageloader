@@ -11,3 +11,7 @@ package cn.netdiscovery.compose.imageloader.utils
 fun clamp(c: Int): Int {
     return if (c > 255) 255 else if (c < 0) 0 else c
 }
+
+fun clamp(x: Int, a: Int, b: Int): Int {
+    return if (x < a) a else if (x > b) b else x
+}
