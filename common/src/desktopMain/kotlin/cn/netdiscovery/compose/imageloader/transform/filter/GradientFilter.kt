@@ -2,6 +2,7 @@ package cn.netdiscovery.compose.imageloader.transform.filter
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import cn.netdiscovery.compose.imageloader.utils.clamp
 import java.awt.image.BufferedImage
 
 /**
@@ -111,9 +112,5 @@ class GradientFilter(val direction: Int = XY_DIRECTION, val isSobel:Boolean = tr
         setRGB(image, 0, 0, width, height, outPixels)
 
         return image.toComposeImageBitmap()
-    }
-
-    fun clamp(c: Int): Int {
-        return if (c > 255) 255 else if (c < 0) 0 else c
     }
 }

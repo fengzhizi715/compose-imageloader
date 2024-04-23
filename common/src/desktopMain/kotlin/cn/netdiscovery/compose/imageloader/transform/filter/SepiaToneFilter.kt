@@ -2,6 +2,7 @@ package cn.netdiscovery.compose.imageloader.transform.filter
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import cn.netdiscovery.compose.imageloader.utils.clamp
 import java.awt.image.BufferedImage
 
 /**
@@ -46,9 +47,5 @@ class SepiaToneFilter :BaseFilter() {
 
     private fun colorBlend(scale: Double, dest: Double, src: Int): Double {
         return scale * dest + (1.0 - scale) * src
-    }
-
-    fun clamp(c: Int): Int {
-        return if (c > 255) 255 else if (c < 0) 0 else c
     }
 }
