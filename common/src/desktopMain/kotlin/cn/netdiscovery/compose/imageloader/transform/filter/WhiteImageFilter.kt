@@ -1,8 +1,9 @@
-package cn.netdiscovery.compose.imageloader.transform
+package cn.netdiscovery.compose.imageloader.transform.filter
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import cn.netdiscovery.compose.imageloader.transform.Transformer
 import java.awt.Color
 import java.awt.image.BufferedImage
 
@@ -14,7 +15,7 @@ import java.awt.image.BufferedImage
  * @date: 2024/4/23 10:24
  * @version: V1.0 <描述当前版本功能>
  */
-class WhiteImageTransformation(val beta:Double = 1.1):Transformer {
+class WhiteImageFilter(val beta:Double = 1.1): Transformer {
 
     override fun transform(imageBitmap: ImageBitmap): ImageBitmap {
         // make LUT
