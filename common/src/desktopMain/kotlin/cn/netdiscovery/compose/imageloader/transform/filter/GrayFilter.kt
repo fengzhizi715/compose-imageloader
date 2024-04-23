@@ -1,27 +1,23 @@
-package cn.netdiscovery.compose.imageloader.transform
+package cn.netdiscovery.compose.imageloader.transform.filter
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import cn.netdiscovery.compose.imageloader.transform.Transformer
 import java.awt.Color
 import java.awt.image.BufferedImage
 
 /**
  *
  * @FileName:
- *          cn.netdiscovery.compose.imageloader.transform.GrayTransformation
+ *          cn.netdiscovery.compose.imageloader.transform.filter.GrayTransformation
  * @author: Tony Shen
  * @date: 2024/4/22 19:53
  * @version: V1.0  Gray = R*0.299+G*0.587+B*0.114
  */
-class GrayTransformation: Transformer {
+class GrayFilter: BaseFilter() {
 
-    override fun transform(imageBitmap: ImageBitmap): ImageBitmap {
-        val width: Int = imageBitmap.width
-        val height: Int = imageBitmap.height
-
-        val image:BufferedImage = imageBitmap.toAwtImage()
-
+    override fun doFilter(image: BufferedImage): ImageBitmap {
         for (row in 0 until height) {
             for (col in 0 until width) {
                 val rgb = image.getRGB(col,row)
