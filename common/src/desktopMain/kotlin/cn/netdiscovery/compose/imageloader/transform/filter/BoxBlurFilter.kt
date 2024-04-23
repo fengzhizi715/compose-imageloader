@@ -25,7 +25,6 @@ class BoxBlurFilter(private val hRadius:Int=5, private val vRadius:Int=5, privat
             blur( outPixels, inPixels, height, width, vRadius )
         }
 
-
         setRGB(image, 0, 0, width, height, inPixels)
         return image.toComposeImageBitmap()
     }
