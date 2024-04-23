@@ -57,6 +57,5 @@ abstract class BaseFilter:Transformer {
         ) else image.setRGB(x, y, width, height, pixels, 0, width)
     }
 
-
     abstract fun doFilter(image: BufferedImage): ImageBitmap
 }
