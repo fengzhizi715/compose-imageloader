@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage
  *          cn.netdiscovery.compose.imageloader.transform.filter.SepiaToneFilter
  * @author: Tony Shen
  * @date: 2024/4/23 15:02
- * @version: V1.0 老照片特效
+ * @version: V1.0 SepiaTone 滤镜， 老照片特效
  */
 class SepiaToneFilter :BaseFilter() {
 
