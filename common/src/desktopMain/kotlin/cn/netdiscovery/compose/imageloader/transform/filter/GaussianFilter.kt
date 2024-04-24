@@ -18,7 +18,7 @@ import kotlin.math.exp
  * @date: 2024/4/23 18:25
  * @version: V1.0 <描述当前版本功能>
  */
-class GaussianFilter(private val radius:Float): BaseFilter() {
+open class GaussianFilter(open val radius:Float): BaseFilter() {
 
     /**
      * Treat pixels off the edge as zero.
