@@ -9,7 +9,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory
 import cn.netdiscovery.compose.imageloader.core.ImageCallback
+import cn.netdiscovery.compose.imageloader.imageFile
 import cn.netdiscovery.compose.imageloader.imageUrl
+import cn.netdiscovery.compose.imageloader.transform.filter.*
 import java.io.File
 
 @Composable
@@ -43,7 +45,7 @@ fun App() {
             Spacer(modifier = Modifier.height(16.dp))
             Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 imageUrl(imageUrl,
-                    transformations = mutableListOf(),
+                    transformations = transformations,
                     imageCallback = ImageCallback(placeHolderView = {
                         defaultPlaceHolderView()
                     }, errorView = {
