@@ -19,3 +19,13 @@ internal fun List<Transformer>?.transformationKey(): String {
         it.javaClass.simpleName
     }
 }
+
+internal fun List<Transformer>?.prettyDisplay(): String {
+    if (this.isNullOrEmpty()) {
+        return "[]"
+    }
+
+    return "["+this.joinToString(",") {
+        it.javaClass.simpleName
+    }+"]"
+}

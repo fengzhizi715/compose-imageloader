@@ -8,6 +8,7 @@ import cn.netdiscovery.compose.imageloader.exception.ImageLoaderException
 import cn.netdiscovery.compose.imageloader.http.HttpConnectionClient
 import cn.netdiscovery.compose.imageloader.log.*
 import cn.netdiscovery.compose.imageloader.transform.Transformer
+import cn.netdiscovery.compose.imageloader.utils.extension.prettyDisplay
 import cn.netdiscovery.compose.imageloader.utils.extension.toBitmapPainter
 import cn.netdiscovery.compose.imageloader.utils.extension.transformationKey
 import kotlinx.coroutines.*
@@ -116,6 +117,7 @@ object ImageLoaderFactory {
         }
 
         return scope.async(Dispatchers.IO) {
+            "url: $url, transformers:${request.transformers.prettyDisplay()}".logD()
 
             val diskKey = md5Key(url)
             val memoryKey = diskKey + request.transformers.transformationKey()
@@ -139,7 +141,6 @@ object ImageLoaderFactory {
 
                     // disk 也取不到数据，则通过 http 获取图片
                     if (cacheFile == null) {
-                        "get url: $url".logD()
                         val data = scope.async(client.dispatcher()) {
                             client.getImage(url, diskKey, request.ua)
                         }.await()
