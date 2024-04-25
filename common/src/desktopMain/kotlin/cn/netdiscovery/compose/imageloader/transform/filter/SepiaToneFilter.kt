@@ -19,6 +19,7 @@ class SepiaToneFilter :BaseFilter() {
         val inPixels = IntArray(width * height)
         val outPixels = IntArray(width * height)
         getRGB(image, 0, 0, width, height, inPixels)
+
         var index = 0
         for (row in 0 until height) {
             var ta = 0
@@ -38,8 +39,8 @@ class SepiaToneFilter :BaseFilter() {
                 outPixels[index] = ta shl 24 or (clamp(fr) shl 16) or (clamp(fg) shl 8) or clamp(fb)
             }
         }
-        setRGB(image, 0, 0, width, height, outPixels)
 
+        setRGB(image, 0, 0, width, height, outPixels)
         return image.toComposeImageBitmap()
     }
 

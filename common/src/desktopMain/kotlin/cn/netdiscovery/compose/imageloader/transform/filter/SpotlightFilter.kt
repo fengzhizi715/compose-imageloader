@@ -44,8 +44,8 @@ class SpotlightFilter(val factor:Int = 1):BaseFilter() {
                 outPixels[index] = ta shl 24 or (tr shl 16) or (tg shl 8) or tb
             }
         }
-        setRGB(image, 0, 0, width, height, outPixels)
 
+        setRGB(image, 0, 0, width, height, outPixels)
         return image.toComposeImageBitmap()
     }
 

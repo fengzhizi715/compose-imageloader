@@ -5,6 +5,9 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import cn.netdiscovery.compose.imageloader.utils.clamp
 import java.awt.image.BufferedImage
 import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  *
@@ -26,14 +29,11 @@ class MotionFilter(private val distance:Float = 0f,private val angle:Float = 0f,
         val cy = height / 2
 
         // calculate the triangle geometry value
-        // calculate the triangle geometry value
-        val sinAngle = Math.sin(angle / 180.0f * PI).toFloat()
-        val coseAngle = Math.cos(angle / 180.0f * PI).toFloat()
+        val sinAngle = sin(angle / 180.0f * PI).toFloat()
+        val coseAngle = cos(angle / 180.0f * PI).toFloat()
 
         // calculate the distance, same as box blur
-
-        // calculate the distance, same as box blur
-        val imageRadius = Math.sqrt((cx * cx + cy * cy).toDouble()).toFloat()
+        val imageRadius = sqrt((cx * cx + cy * cy).toDouble()).toFloat()
         val maxDistance: Float = distance + imageRadius * zoom
 
         val iteration = maxDistance.toInt()
@@ -98,7 +98,6 @@ class MotionFilter(private val distance:Float = 0f,private val angle:Float = 0f,
         }
 
         setRGB(image, 0, 0, width, height, outPixels)
-
         return image.toComposeImageBitmap()
     }
 }
