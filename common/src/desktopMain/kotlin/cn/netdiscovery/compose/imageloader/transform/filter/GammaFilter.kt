@@ -13,12 +13,11 @@ import java.awt.image.BufferedImage
  * @date: 2024/4/25 12:59
  * @version: V1.0 <描述当前版本功能>
  */
-class GammaFilter(val gamma:Double = 0.5): BaseFilter() {
+class GammaFilter(private val gamma:Double = 0.5): BaseFilter() {
 
-    private val lut: IntArray
+    private val lut: IntArray = IntArray(256)
 
     init {
-        this.lut = IntArray(256)
         setupGammaLut()
     }
 

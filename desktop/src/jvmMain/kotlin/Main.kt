@@ -79,6 +79,14 @@ fun main() = application {
                         transformations.clear()
                         transformations.add(BoxBlurFilter())
                     })
+                    Item("ConBriFilter", onClick = {
+                        transformations.clear()
+                        transformations.add(ConBriFilter())
+                    })
+                    Item("GammaFilter", onClick = {
+                        transformations.clear()
+                        transformations.add(GammaFilter())
+                    })
                     Item("GaussianFilter", onClick = {
                         transformations.clear()
                         transformations.add(GaussianFilter(10.0f))
