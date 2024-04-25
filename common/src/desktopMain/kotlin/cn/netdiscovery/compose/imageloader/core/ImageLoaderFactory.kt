@@ -89,6 +89,8 @@ object ImageLoaderFactory {
     private suspend fun runFileLoad(file: File, transformers: MutableList<Transformer>): ImageResponse {
 
         return scope.async(Dispatchers.IO) {
+            "file: ${file.absolutePath}, transformers:${transformers.prettyDisplay()}".logD()
+
             val key = md5Key(file.absolutePath) + transformers.transformationKey()
             val cachedImageBitmap = memoryLruCache.getBitmap(key)
             if (cachedImageBitmap != null) {
