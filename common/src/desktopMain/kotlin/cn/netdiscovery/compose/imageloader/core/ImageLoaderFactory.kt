@@ -41,7 +41,8 @@ object ImageLoaderFactory {
     private lateinit var logger:Logger
 
     private val job = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.IO + job)
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val scope = CoroutineScope(dispatcher + job)
 
     private var diskLruCache: DiskLruCache? = null
     private lateinit var memoryLruCache: MemoryCache
@@ -118,7 +119,7 @@ object ImageLoaderFactory {
             return ImageResponse(null, NullPointerException("Url is null or empty!"))
         }
 
-        return scope.async(Dispatchers.IO) {
+        return scope.async(dispatcher) {
             "url: $url, transformers:${request.transformers.prettyDisplay()}".logD()
 
             val diskKey = md5Key(url)
@@ -165,7 +166,6 @@ object ImageLoaderFactory {
                 }
             } else {
                 // 每次通过 http 获取图片
-                "get url: $url".logD()
                 val data = scope.async(client.dispatcher()) {
                     client.getImage(url, diskKey, request.ua)
                 }.await()

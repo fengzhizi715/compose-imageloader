@@ -1,35 +1,13 @@
 package cn.netdiscovery.compose.imageloader.cache.memory
 
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.ImageBitmapConfig
 import cn.netdiscovery.compose.imageloader.cache.LruCache
 
 class MemoryCache(size: Long) {
     private val lruCache: LruCache<String, ImageBitmap>
 
     init {
-        lruCache = LruCache(size, sizeCalculator = { key, value ->
-            val s = when (value.config) {
-                ImageBitmapConfig.Argb8888 -> {
-                    4
-                }
-
-                ImageBitmapConfig.Alpha8 -> {
-                    1
-                }
-
-                ImageBitmapConfig.Rgb565 -> {
-                    3
-                }
-
-                ImageBitmapConfig.F16 -> {
-                    4
-                }
-
-                else -> {
-                    4
-                }
-            }
+        lruCache = LruCache(size, sizeCalculator = { _, value ->
             (value.width * value.height).toLong()
         })
     }
