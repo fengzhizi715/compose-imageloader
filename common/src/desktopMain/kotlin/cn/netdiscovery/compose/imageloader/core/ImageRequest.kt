@@ -16,8 +16,6 @@ class ImageRequest {
     internal var url: String? = null
     internal var file: File? = null
     internal var useCache:Boolean = true
-
-    internal var saveStrategy = SaveStrategy.ORIGINAL
     internal var transformers = mutableListOf<Transformer>()
 
     companion object{
@@ -41,11 +39,6 @@ class ImageRequest {
 
     fun useCache(useCache: Boolean): ImageRequest {
         this.useCache = useCache
-        return this
-    }
-
-    fun saveStrategy(strategy: SaveStrategy): ImageRequest {
-        saveStrategy = strategy
         return this
     }
 

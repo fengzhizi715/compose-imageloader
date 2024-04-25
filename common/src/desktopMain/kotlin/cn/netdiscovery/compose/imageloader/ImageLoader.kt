@@ -21,7 +21,6 @@ actual fun imageUrl(url: String, transformations: List<Transformer>?, imageCallb
         ImageRequest.create()
             .url(url)
             .transformations(transformations)
-            .saveStrategy(SaveStrategy.ORIGINAL)
             .request()
     }
 }
@@ -33,7 +32,6 @@ actual fun imageFile(filePath: String, transformations: List<Transformer>?, imag
         ImageRequest.create()
             .file(File(filePath))
             .transformations(transformations)
-            .saveStrategy(SaveStrategy.ORIGINAL)
             .request()
     }
 }
