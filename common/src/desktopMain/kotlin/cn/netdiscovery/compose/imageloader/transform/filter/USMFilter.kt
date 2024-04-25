@@ -21,8 +21,8 @@ class USMFilter(override val radius: Float =2f, val amount: Float = 0.5f, val th
         getRGB(image, 0, 0, width, height, inPixels)
 
         if ( radius > 0 ) {
-            convolveAndTranspose(kernel, inPixels, outPixels, width, height, alpha, alpha && premultiplyAlpha, false, CLAMP_EDGES);
-            convolveAndTranspose(kernel, outPixels, inPixels, height, width, alpha, false, alpha && premultiplyAlpha, CLAMP_EDGES);
+            convolveAndTranspose(kernel, inPixels, outPixels, width, height, alpha, alpha && premultiplyAlpha, false, CLAMP_EDGES)
+            convolveAndTranspose(kernel, outPixels, inPixels, height, width, alpha, false, alpha && premultiplyAlpha, CLAMP_EDGES)
         }
 
         getRGB( image,0, 0, width, height, outPixels)
