@@ -24,10 +24,6 @@ import kotlin.properties.Delegates
  * @date: 2024/4/16 23:47
  * @version: V1.0 <描述当前版本功能>
  */
-enum class SaveStrategy {
-    ORIGINAL, TRANSFORMED
-}
-
 object ImageLoaderFactory {
 
     private const val CACHE_DEFAULT_MEMORY_SIZE = 1024 * 1024 * 300L // 300 M memory
