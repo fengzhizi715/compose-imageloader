@@ -12,6 +12,7 @@ import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.transform.CenterCropTransformation
 import cn.netdiscovery.compose.imageloader.transform.CircleCropTransformation
 import cn.netdiscovery.compose.imageloader.transform.ResizeTransformation
@@ -38,8 +39,6 @@ val imageList = arrayListOf(
 
 var imageUrl by mutableStateOf(imageList.first())
 
-val transformationList = arrayListOf<Transformer>()
-
 var transformations by mutableStateOf(arrayListOf<Transformer>())
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -61,82 +60,56 @@ fun main() = application {
 
                 Menu("transform") {
                     Item("CenterCropTransformation", onClick = {
-                        transformationList.clear()
-                        transformationList.add(CenterCropTransformation(400,400))
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(CenterCropTransformation(400,400))
                     })
                     Item("CircleCropTransformation", onClick = {
-                        transformationList.clear()
-                        transformationList.add(CircleCropTransformation(400f, Color.Red, Color.Gray))
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(CircleCropTransformation(400f, Color.Red, Color.Gray))
                     })
                     Item("ResizeTransformation", onClick = {
-                        transformationList.clear()
-                        transformationList.add(ResizeTransformation(400,400))
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(ResizeTransformation(400,400))
                     })
                     Item("BilateralFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(BilateralFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(BilateralFilter())
                     })
                     Item("BoxBlurFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(BoxBlurFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(BoxBlurFilter())
                     })
                     Item("GaussianFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(GaussianFilter(10.0f))
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(GaussianFilter(10.0f))
                     })
                     Item("GradientFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(GradientFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(GradientFilter())
                     })
                     Item("GrayFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(GrayFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(GrayFilter())
                     })
                     Item("MotionFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(MotionFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(MotionFilter())
                     })
                     Item("SepiaToneFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(SepiaToneFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(SepiaToneFilter())
                     })
                     Item("SpotlightFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(SpotlightFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(SpotlightFilter())
                     })
                     Item("USMFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(USMFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(USMFilter())
                     })
                     Item("WhiteImageFilter", onClick = {
-                        transformationList.clear()
-                        transformationList.add(WhiteImageFilter())
-
-                        transformations = transformationList
+                        transformations.clear()
+                        transformations.add(WhiteImageFilter())
                     })
                 }
             }
