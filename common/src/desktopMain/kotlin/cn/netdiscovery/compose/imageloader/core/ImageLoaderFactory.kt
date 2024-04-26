@@ -44,13 +44,14 @@ object ImageLoaderFactory {
     private lateinit var memoryLruCache: MemoryCache
     private lateinit var imageCacheDir: File
     private lateinit var client: HttpConnectionClient
-    const val RETRY_MAX = 3
+    private var retryMax = 3
 
     fun configuration(
         maxMemoryCacheSize: Long = CACHE_DEFAULT_MEMORY_SIZE,
         maxDiskCacheSize: Long = CACHE_DEFAULT_DISK_SIZE,
         rootDirectory: File = USER_DIR,
         timeout: Int = 6000,
+        retryNum: Int = retryMax,
         logger:Logger = defaultLogger
     ) {
         ImageLoaderFactory.maxMemoryCacheSize = maxMemoryCacheSize
@@ -59,7 +60,7 @@ object ImageLoaderFactory {
         ImageLoaderFactory.logger = logger
 
         memoryLruCache = MemoryCache(ImageLoaderFactory.maxMemoryCacheSize)
-        client = HttpConnectionClient(timeout = timeout)
+        client = HttpConnectionClient(timeout = timeout,retryNum = retryNum)
 
         imageCacheDir = File(ImageLoaderFactory.rootDirectory, "imageCache")
         if (!imageCacheDir.exists()) {

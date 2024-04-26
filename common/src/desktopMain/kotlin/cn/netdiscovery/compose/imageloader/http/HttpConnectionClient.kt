@@ -1,7 +1,6 @@
 package cn.netdiscovery.compose.imageloader.http
 
 import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
-import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory.RETRY_MAX
 import cn.netdiscovery.compose.imageloader.log.logD
 import cn.netdiscovery.compose.imageloader.log.logE
 import cn.netdiscovery.compose.imageloader.utils.closeQuietly
@@ -14,7 +13,8 @@ import java.net.HttpURLConnection
 
 class HttpConnectionClient(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val timeout:Int = 6000
+    private val timeout: Int,
+    private val retryNum: Int,
 ) {
     var diskLruCache: DiskLruCache? = null
 
@@ -47,7 +47,7 @@ class HttpConnectionClient(
                 }
 
                 retry++
-            } while (retry < RETRY_MAX)
+            } while (retry < retryNum)
 
             if (conn?.responseCode != 200) {
                 "Response status code is ${conn?.responseCode}".logE()
