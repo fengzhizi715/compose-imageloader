@@ -50,6 +50,7 @@ object ImageLoaderFactory {
         maxMemoryCacheSize: Long = CACHE_DEFAULT_MEMORY_SIZE,
         maxDiskCacheSize: Long = CACHE_DEFAULT_DISK_SIZE,
         rootDirectory: File = USER_DIR,
+        timeout: Int = 6000,
         logger:Logger = defaultLogger
     ) {
         ImageLoaderFactory.maxMemoryCacheSize = maxMemoryCacheSize
@@ -58,7 +59,7 @@ object ImageLoaderFactory {
         ImageLoaderFactory.logger = logger
 
         memoryLruCache = MemoryCache(ImageLoaderFactory.maxMemoryCacheSize)
-        client = HttpConnectionClient()
+        client = HttpConnectionClient(timeout = timeout)
 
         imageCacheDir = File(ImageLoaderFactory.rootDirectory, "imageCache")
         if (!imageCacheDir.exists()) {

@@ -4,18 +4,17 @@ import cn.netdiscovery.compose.imageloader.cache.disk.DiskLruCache
 import cn.netdiscovery.compose.imageloader.core.ImageLoaderFactory.RETRY_MAX
 import cn.netdiscovery.compose.imageloader.log.logD
 import cn.netdiscovery.compose.imageloader.log.logE
-import cn.netdiscovery.compose.imageloader.log.logI
 import cn.netdiscovery.compose.imageloader.utils.closeQuietly
 import cn.netdiscovery.compose.imageloader.utils.extension.openConnection
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 
 class HttpConnectionClient(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val timeout:Int = 6000
 ) {
     var diskLruCache: DiskLruCache? = null
 
@@ -27,7 +26,7 @@ class HttpConnectionClient(
         try {
             var retry = 0
             do {
-                conn = url.openConnection(ua)
+                conn = url.openConnection(ua,timeout,timeout)
                 conn.requestMethod = "GET"
 
                 when (conn.responseCode) {
