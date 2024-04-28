@@ -1,7 +1,6 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.lightColors
@@ -19,7 +18,7 @@ import java.io.File
 @Composable
 fun defaultPlaceHolderView() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator(modifier = Modifier.size(64.dp), strokeWidth = 6.dp)
+        ThreeBallLoading(Modifier)
     }
 }
 
