@@ -13,7 +13,7 @@ import kotlin.math.sqrt
  * @date: 2024/4/23 13:50
  * @version: V1.0 光源退化滤镜
  */
-class SpotlightFilter(val factor:Int = 1):BaseFilter() {
+class SpotlightFilter(private val factor:Int = 1):BaseFilter() {
 
     override fun doFilter(image: BufferedImage): ImageBitmap {
         val inPixels = IntArray(width * height)
